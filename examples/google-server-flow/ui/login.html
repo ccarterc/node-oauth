@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+
+<button id="google-login" class="btn btn-primary">Log In with Google</button>
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+
+<script>
+  //sample app
+  var app = (function(app){
+  	var dialogUrl = "";
+
+    app.init = function(){
+    	getDialogUrl();
+        attachEventListeners();
+    };
+    app.user = {};
+    app.auth = {};
+
+
+	function getDialogUrl(){
+		$.get('/googleDialog', function(response){
+			dialogUrl = response;
+		});
+	}
+
+	function loginStep1(){
+		var win = window.open(dialogUrl, '_self');
+	}
+
+    function attachEventListeners(){
+      $(document).on('click', '#google-login', loginStep1);
+    }
+
+    return app;
+  })({});
+
+  function loadGoogleAuth(){
+    console.log('did the init()');
+    gapi.load('auth2', function(){
+      console.log('auth2 loaded');
+      gapi.auth2.init({
+        client_id: '165926554192-kpc635lu35941q8dfs5tmleqaafqstl9.apps.googleusercontent.com'
+      });
+      app.init();
+    });
+  }
+
+</script>
+<script src="https://apis.google.com/js/platform.js?onload=loadGoogleAuth" async defer></script>
+</body>
+</html>

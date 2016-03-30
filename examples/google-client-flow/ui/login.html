@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+
+<button id="google-login" class="btn btn-primary">Log In with Google</button>
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+
+<script>
+  //sample app
+  var app = (function(app){
+    app.init = function(){
+        attachEventListeners();
+    };
+    app.user = {}
+    app.auth = {};
+
+    function loginToServer(){
+      console.log('loginToServer');
+      $.get('/login/google?access_token='+app.auth.accessToken)
+      .done(function(resp){
+        console.log('response from server: ', resp);
+        alert('check console for the info returned from server.');
+      })
+    }
+
+    function googleSignIn(){
+      var googleAuth = gapi.auth2.getAuthInstance();
+      googleAuth.signIn()
+      .then(function(googleUser){
+        app.googleUser = googleUser;//https://developers.google.com/identity/sign-in/web/reference#googleauthsigninwzxhzdk52optionswzxhzdk53
+        app.googleAuth = gapi.auth2.getAuthInstance();//just so you can play around with google api
+
+        app.user = {
+          email: googleUser.getBasicProfile().getEmail(),
+          name: googleUser.getBasicProfile().getName(),
+          id: googleUser.getBasicProfile().getId()
+        };
+        app.auth = {accessToken: googleUser.getAuthResponse().id_token};
+        loginToServer();
+      });
+      //gapi.auth2.GoogleAuth.signIn();
+    }
+
+
+    function attachEventListeners(){
+      $(document).on('click', '#google-login', googleSignIn);
+    }
+
+    return app;
+  })({});
+
+  function loadGoogleAuth(){
+    console.log('did the init()');
+    gapi.load('auth2', function(){
+      console.log('auth2 loaded');
+      gapi.auth2.init({
+        client_id: '165926554192-kpc635lu35941q8dfs5tmleqaafqstl9.apps.googleusercontent.com'
+      });
+      app.init();
+    });
+  }
+
+</script>
+<script src="https://apis.google.com/js/platform.js?onload=loadGoogleAuth" async defer></script>
+</body>
+</html>

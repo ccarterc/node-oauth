@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div id="status">Wait for Page to load...</div>
+<button id="login-btn">Login to Facebook</button>
+
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+
+var app = (function(app){
+	var dialogUrl = "";
+
+	app.init = function(){
+		getDialogUrl();
+		attachEventListeners();
+
+		$('#status').html('Ready for you!');
+	}
+
+	function getDialogUrl(){
+		$.get('/facebookDialog', function(response){
+			dialogUrl = response;
+		});
+	}
+
+	function loginStep1(){
+		var win = window.open(dialogUrl, '_self');
+	}
+
+	function attachEventListeners(){
+		$(document).on('click', '#login-btn', loginStep1);
+	}
+
+	return app;
+}(app || {}));
+
+
+$(document).ready(app.init);
+</script>
+</body>
+</html>

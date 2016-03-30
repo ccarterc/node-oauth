@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<head>
+
+</head>
+<body>
+<button id="log-in" class="btn btn-primary">Log In with Facebook</button><br><br>
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+
+<script>
+	//sample app
+  var app = (function(app){
+  	app.init = function(){
+  		attachEventListeners();
+  	};
+  	app.user = {}
+  	app.auth = {};
+
+  	function loginToFb(){
+  		var response;
+			//Call fb sdk login to get accessToken and email
+		FB.login(function(response){
+	  		console.log('fb login response: ', response);
+	  		app.auth = response.authResponse;
+	  		//get the user info including email and name
+	  		FB.api('/me', function(response) {
+   				app.user = response;
+   				loginToServer();
+ 			});
+		}, {scope: "email"});
+  	}
+  	function loginToServer(){
+  		console.log('loginToServer');
+  		$.get('/login/facebook?access_token='+app.auth.accessToken)
+  		.done(function(resp){
+  			console.log('response from server: ', resp);
+  			alert('check console for the info returned from server.');
+  		})
+  	}
+
+  	function attachEventListeners(){
+  		$(document).on('click', '#log-in', loginToFb);
+  	}
+
+  	return app;
+  })({});
+
+
+
+//fb sdk loading and app trigger
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '485486754943048',
+      xfbml      : true,
+      version    : 'v2.3'
+    });
+    app.init();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+</body>
+</html>
