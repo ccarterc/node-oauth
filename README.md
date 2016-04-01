@@ -88,6 +88,67 @@ oauth.fb.exchangeCode(FB_AUTH_CODE)
 });
 ```
 
+### Google
+
+### Set the google specific configuration:
+
+```
+oauth.common.configure({
+	clientId: "YOUR_CLIENT_ID",
+  	secret: "YOUR_GOOGLE_SECRET",
+  	redirectPath: "/login/googleRedirectTarget",
+  	scope: "openid%20email",
+  	state: "ThisIsWhereCsrfTokenShouldGo"
+});
+```
+
+### Now you can perform the following operations:
+
+```
+//get the dialog link that the client needs to load in a window to allow login through Google
+oauth.google.dialog
+```
+
+```
+//exchange the auth code for an oauth token
+oauth.google.exchangeCode(auth_code_from_google_redirect)
+.then(function(resp){
+	console.log('google exchangeCode response:', resp);
+})
+.catch(function(e){
+	console.log('error:', e);
+	res.json({status: "failed"});
+});
+```
+
+```
+//validate an oauth token and get user info
+oauth.google.inspectToken(token)
+.then(function(resp){
+	res.send(resp);
+})
+.catch(function(e){
+	console.log('error:', e);
+	res.json({status: "failed"});
+});
+```
+
+With chaining a server side flow might look like:
+```
+oauth.google.exchangeCode(GOOGLE_AUTH_CODE)
+.then(function(resp){
+	return oauth.google.inspectToken(resp.id_token);
+})
+.then(function(resp){
+	res.send(resp);
+})
+.catch(function(e){
+	console.log('error:', e);
+	res.json({status: "failed"});
+});
+```
+
+
 ### Most Recent Changes:
 
  - Eliminated Q dependency.  Using real `Promise` now.
