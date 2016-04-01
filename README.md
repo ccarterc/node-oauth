@@ -87,3 +87,7 @@ oauth.fb.exchangeCode(FB_AUTH_CODE)
 	console.log('error:', e);
 });
 ```
+
+### Most Recent Changes:
+
+ - Eliminated Q dependency.  Using real `Promise` now.
